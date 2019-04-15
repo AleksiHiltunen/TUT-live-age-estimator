@@ -212,7 +212,7 @@ class ControllerThread(threading.Thread):
             
         for face in validFaces:
             self.drawFace(face, frame)
-        
+        print(self.displaysize)
         frame = cv2.resize(frame, self.displaysize)
         cv2.imshow(self.caption, frame)
         key = cv2.waitKey(10)
