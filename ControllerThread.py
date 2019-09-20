@@ -30,6 +30,8 @@ class ControllerThread(threading.Thread):
         self.imageSaveTime = time.time()
         os.makedirs('saves', exist_ok=True)
 
+        self.face_expressions = []
+
         self.terminated = False
         self.caption = params.get("window", "caption")        
 
@@ -43,7 +45,6 @@ class ControllerThread(threading.Thread):
         self.resolution = subprocess.Popen('xrandr | grep "\*" | cut -d" " -f4',
                                            shell=True, stdout=subprocess.PIPE).communicate()[0].decode("utf-8").rstrip().split('x')
         self.resolution = [int(s) for s in self.resolution]
-        print(self.resolution)
 
         # Start frame storage
         # queueLength = params.getint("server", "num_frames")
@@ -187,6 +188,12 @@ class ControllerThread(threading.Thread):
                         color = [255,255,0],
                         thickness = 2)
 
+    def saveExpression(self, face):
+        if "expression" in list(face.keys()):
+             expression = face["expression"]
+             annotation = "%s" % (expression)
+             self.face_expressions[-1].append(annotation)
+
     def showVideo(self, unit):
         
         unit.acquire()
@@ -209,10 +216,28 @@ class ControllerThread(threading.Thread):
         #        cv2.imwrite(os.path.join('saves', filename + ".jpg"), frame)
         #    except:
         #        pass
-            
+        self.face_expressions.append([])
         for face in validFaces:
             self.drawFace(face, frame)
-        print(self.displaysize)
+            self.saveExpression(face)
+
+        ip = ""
+        with open("./ip_file.txt", "r") as f:
+            ip = f.read()
+
+        print(self.face_expressions)
+        if(len(self.face_expressions) > 2):
+            if(self.face_expressions[-3] == self.face_expressions[-2] and 
+               self.face_expressions[-2] == self.face_expressions[-1]):
+               process_animation = subprocess.Popen(("python ./react.py " + ip + " " + self.face_expressions[-1][0] + " &").split(), stdout=subprocess.PIPE)
+               process_speech = subprocess.Popen(("python ./react_say.py " + ip + " " + self.face_expressions[-1][0] + " &").split(), stdout=subprocess.PIPE)
+               process_animation.wait()
+               process_speech.wait()
+               self.face_expressions = self.face_expressions[-1]
+
+        if len(self.face_expressions[-1]) == 0:
+            del self.face_expressions[-1]
+
         frame = cv2.resize(frame, self.displaysize)
         cv2.imshow(self.caption, frame)
         key = cv2.waitKey(10)

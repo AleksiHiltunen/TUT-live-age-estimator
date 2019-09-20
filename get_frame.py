@@ -13,7 +13,6 @@ def main(ip, id):
 	w = 320
 	h = 240
 	result = video.getImageRemote(id)
-	'''return result[6]'''
 	image = np.zeros((h, w, 3), np.uint8)
 	values = map(ord, list(result[6]))
 	i = 0

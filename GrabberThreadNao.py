@@ -38,7 +38,7 @@ class GrabberThread(threading.Thread):
         self.parent = parent
 
         #Initializing the video device of the robot
-        process = subprocess.Popen("python /home/aleksi/TUT-live-age-estimator/subscribe_camera.py 192.168.43.161".split(), stdout=subprocess.PIPE)
+        process = subprocess.Popen("python /home/aleksi/TUT-live-age-estimator/subscribe_camera.py 192.168.1.105".split(), stdout=subprocess.PIPE)
         process.wait()
 
         print("Grabber Thread initialized...")
@@ -47,7 +47,7 @@ class GrabberThread(threading.Thread):
         while not self.parent.isTerminated():
 
             #stat, frame = self.video.read()
-            python2_cmd = "python /home/aleksi/TUT-live-age-estimator/get_frame.py 192.168.43.161 camera_0"
+            python2_cmd = "python /home/aleksi/TUT-live-age-estimator/get_frame.py 192.168.1.105 camera_0"
             process = subprocess.Popen(python2_cmd.split(), stdout=subprocess.PIPE)
             process.wait()
             #output, error = process.communicate()

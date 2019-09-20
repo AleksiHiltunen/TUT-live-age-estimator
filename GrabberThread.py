@@ -37,8 +37,11 @@ class GrabberThread(threading.Thread):
         self.flipHor = params.getint("camera", "flip_horizontal")
         self.parent = parent
 
+        with open("./ip_file.txt", "r") as f:
+             self.ip = f.read()
+
         #Initializing the video device of the robot
-        process = subprocess.Popen("python /home/aleksi/TUT-live-age-estimator/subscribe_camera.py 192.168.43.161".split(), stdout=subprocess.PIPE)
+        process = subprocess.Popen(("python ./subscribe_camera.py " + ip).split(), stdout=subprocess.PIPE)
         process.wait()
 
         print("Grabber Thread initialized...")
@@ -47,7 +50,7 @@ class GrabberThread(threading.Thread):
         while not self.parent.isTerminated():
 
             #stat, frame = self.video.read()
-            python2_cmd = "python /home/aleksi/TUT-live-age-estimator/get_frame.py 192.168.43.161 camera_0"
+            python2_cmd = "python ./get_frame.py " + ip + " camera_0"
             process = subprocess.Popen(python2_cmd.split(), stdout=subprocess.PIPE)
             process.wait()
             #output, error = process.communicate()
@@ -56,11 +59,6 @@ class GrabberThread(threading.Thread):
                 d = data["data"]
                 frame = np.array(d)
                 frame = frame.astype(np.uint8)
-                print(frame)
-                print(type(frame))
-                print(len(frame))
-                print(len(frame[0]))
-                print(type(frame[0][0][0]))
 
             if frame is not None and not self.parent.isTerminated():
                 if self.flipHor:
