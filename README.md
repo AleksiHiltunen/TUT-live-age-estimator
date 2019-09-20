@@ -2,6 +2,8 @@
 
 **Python implementation of a live deep learning based age/gender/expression recognizer.**
 
+*This repository is forked from https://github.com/mahehu/TUT-live-age-estimator and is modified to use SoftBank Robotics' robots camera as video input, instead of webcam.*
+
 ![Image](doc/demo.jpg "demo")
 
 All components use convolutional networks:
